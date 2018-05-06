@@ -1,17 +1,9 @@
 {
+   "singleton" : true,
    "author" : "Luis Rascao",
    "category" : "environment",
-   "defaults" : {
-      "description" : "__m_descr__",
-      "intensityThreshold" : 0,
-      "popThreshold" : 0,
-      "rainSensorPoll" : 0,
-      "rainSensors" : [],
-      "title" : "__m_title__",
-      "windows" : []
-   },
    "dependencies" : [
-      "BaseModule"
+      "Cron"
    ],
    "homepage" : "https://github.com/lrascao/zway-ipma/",
    "icon" : "icon.png",
@@ -22,15 +14,14 @@
       }
    },
    "repository" : {
-      "source" : "https://github.com/lrascao/zway-ipma/",
-      "type" : "git"
+      "type" : "git",
+      "source" : "https://github.com/lrascao/zway-ipma/"
+   },
+   "defaults" : {
+      "description" : "__m_descr__",
+      "title" : "__m_title__"
    },
    "schema" : {
-      "properties" : {
-      },
-      "required" : true,
-      "type" : "object"
    },
-   "singleton" : true,
    "version" : "1.0.0"
 }
