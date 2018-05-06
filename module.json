@@ -9,19 +9,33 @@
    "icon" : "icon.png",
    "maturity" : "stable",
    "moduleName" : "IPMA",
-   "options" : {
-      "fields" : {
-      }
-   },
    "repository" : {
       "type" : "git",
       "source" : "https://github.com/lrascao/zway-ipma/"
    },
    "defaults" : {
       "description" : "__m_descr__",
-      "title" : "__m_title__"
+      "title" : "__m_title__",
+      "rainProbabilityThreshold" : 20.0
    },
    "schema" : {
+        "type": "object",
+        "properties": {
+            "rainProbabilityThreshold" : {
+                "required": true
+            }
+        },
+        "required": true
+   },
+   "options" : {
+      "fields" : {
+         "rainProbabilityThreshold" : {
+            "helper" : "__rain_probability_threshold_helper__",
+            "label" : "__rain_probability_threshold_label__",
+            "order" : 1,
+            "required": true
+         }
+      }
    },
    "version" : "1.0.0"
 }
