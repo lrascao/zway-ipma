@@ -1,6 +1,8 @@
 {
    "m_title" : "IPMA Weather Sensor",
    "m_descr" : "IPMA Weather Sensor",
-   "ipma_location_code_label" : "IPMA locaion code",
-   "ipma_location_code_helper" : "Json list of location codes can be fetch with `curl http://api.ipma.pt/open-data/distrits-islands.json`"
+   "ipma_location_code_label" : "IPMA location code",
+   "ipma_location_code_helper" : "Json list of location codes can be fetch with `curl http://api.ipma.pt/open-data/distrits-islands.json`",
+   "day_offset_label" : "Day offset (from today)",
+   "day_offset_helper" : "0 is today, 1 is tomorrow, etc (until 4)"
 }
