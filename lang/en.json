@@ -1,4 +1,6 @@
 {
    "m_title" : "IPMA Rain Sensor",
-   "m_descr" : "IPMA Rain Sensor"
+   "m_descr" : "IPMA Rain Sensor",
+   "rain_probability_threshold_helper" : "Set virtual to on if rain probability exceeds this threshold",
+   "rain_probability_threshold_label" : "Rain probability threshold"
 }
