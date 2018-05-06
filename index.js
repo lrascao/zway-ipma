@@ -18,7 +18,7 @@ function IPMA (id, controller) {
     this.pollTimeout        = undefined;
 }
 
-inherits(IPMA, BaseModule);
+inherits(IPMA, AutomationModule);
 
 _module = IPMA;
 
@@ -30,52 +30,51 @@ IPMA.prototype.init = function (config) {
     IPMA.super_.prototype.init.call(this, config);
 
     var self = this;
-    self.callback       = _.bind(self.check,self);
+    self.callback = _.bind(self.check, self);
 
-    // Create vdev
-    self.vDev = this.controller.devices.create({
+    // Create rain sensor
+    self.rainSensor = this.controller.devices.create({
         deviceId: "IPMA_" + self.id,
         defaults: {
+            deviceType: 'sensorBinary',
             metrics: {
-                title: self.langFile.m_title,
+                title: 'IPMA',
                 level: 'off',
                 rain: 'off',
-                sources: [],
                 icon: self.imagePath+'/icon_norain.png'
             }
         },
         overlay: {
-            probeType: 'rain',
             deviceType: 'sensorBinary',
-        },
-        handler: function (command,args){
-            if (command === 'update'
-                && typeof(args) !== 'undefined') {
-                self.check('update');
-            }
         },
         moduleId: this.id
     });
 
-    // Invoke the init callback after 1m
-    setTimeout(_.bind(self.initCallback,self), 60*1000);
+    this.do_check = function() {
+        self.check();
+    };
 
-    // trigger a check every 10m
-    self.interval = setInterval(_.bind(self.check, self, 'interval'), 10*60*1000);
-};
+    // Setup event listeners
+    this.controller.on("ipma.check", this.do_check);
 
-IPMA.prototype.initCallback = function() {
-    var self = this;
+    // Add Cron schedule to periodically check IPMA
+    this.controller.emit("cron.addTask", "ipma.check", {
+        minute: [0, 59, 1],
+        hour: null,
+        weekDay: null,
+        day: null,
+        month: null
+    });
 
-    self.check('init');
+    console.log('IPMA initialized');
 };
 
 IPMA.prototype.stop = function () {
     var self = this;
 
-    if (self.vDev) {
-        self.controller.devices.remove(self.vDev.id);
-        self.vDev = undefined;
+    if (self.rainSensor) {
+        self.controller.devices.remove(self.rainSensor.id);
+        self.rainSensor = undefined;
     }
 
     clearInterval(self.interval);
@@ -90,7 +89,9 @@ IPMA.prototype.stop = function () {
 // --- Module methods
 // ----------------------------------------------------------------------------
 
-IPMA.prototype.check = function(trigger) {
-    self.log('Checking IPMA');
+IPMA.prototype.check = function() {
+    var self = this;
+
+    console.log('Checking IPMA');
 };
 
