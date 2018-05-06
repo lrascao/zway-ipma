@@ -90,7 +90,7 @@ IPMA.prototype.init = function (config) {
 
     // Add Cron schedule to periodically check IPMA
     this.controller.emit("cron.addTask", "ipma.check", {
-        minute: [0, 59, 1],
+        minute: [0, 59, 15],
         hour: null,
         weekDay: null,
         day: null,
