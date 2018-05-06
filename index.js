@@ -39,7 +39,7 @@ IPMA.prototype.init = function (config) {
                 scaleTitle: '%',
                 title: 'IPMA rain probability virtual sensor',
                 level: '0.0',
-                icon: self.imagePath+'/icon_norain.png'
+                icon: 'barometer'
             }
         },
         overlay: {},
@@ -127,6 +127,8 @@ IPMA.prototype.check = function() {
     var self = this;
 
     var ipmaLocationCode = self.config.ipmaLocationCode;
+    var dayOffset = self.config.dayOffset;
+
     request = {
         url: IPMA_5_DAY_LOCAL_FORECAST_PREFIX + '/' + ipmaLocationCode + '.json',
         method: 'GET',
@@ -134,7 +136,7 @@ IPMA.prototype.check = function() {
             'Content-Type': 'application/json'
         }
     };
-    console.log('[IPMA] request: ' + JSON.stringify(request));
+    // console.log('[IPMA] request: ' + JSON.stringify(request));
     var response = http.request(request);
     // console.log('[IPMA] response: ' + JSON.stringify(response));
     if (response.status != 200) {
@@ -142,12 +144,12 @@ IPMA.prototype.check = function() {
         return;
     }
 
-    var todaysPrediction = response.data.data[0];
-    console.log('[IPMA] todays prediction: ' + JSON.stringify(todaysPrediction));
+    var prediction = response.data.data[dayOffset];
+    console.log('[IPMA] day #' + dayOffset.toString() + ' prediction: ' + JSON.stringify(prediction));
 
-    var todaysRainProbability = parseFloat(todaysPrediction.precipitaProb);
-    var todaysMinTemp = parseFloat(todaysPrediction.tMin);
-    var todaysMaxTemp = parseFloat(todaysPrediction.tMax);
+    var todaysRainProbability = parseFloat(prediction.precipitaProb);
+    var todaysMinTemp = parseFloat(prediction.tMin);
+    var todaysMaxTemp = parseFloat(prediction.tMax);
 
     self.rainProbabilitySensor.set('metrics:level', todaysRainProbability);
     self.maxTempSensor.set('metrics:level', todaysMaxTemp);

@@ -16,12 +16,16 @@
    "defaults" : {
       "description" : "__m_descr__",
       "title" : "__m_title__",
-      "ipmaLocationCode" : "1110600"
+      "ipmaLocationCode" : "1110600",
+      "dayOffset": 0
    },
    "schema" : {
         "type": "object",
         "properties": {
             "ipmaLocationCode" : {
+                "required": true
+            },
+            "dayOffset" : {
                 "required": true
             }
         },
@@ -33,6 +37,12 @@
             "helper" : "__ipma_location_code_helper__",
             "label" : "__ipma_location_code_label__",
             "order" : 1,
+            "required": true
+         },
+         "dayOffset" : {
+            "helper" : "__day_offset_helper__",
+            "label" : "__day_offset_label__",
+            "order" : 2,
             "required": true
          }
       }
