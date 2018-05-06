@@ -14,9 +14,6 @@ const IPMA_5_DAY_LOCAL_FORECAST_PREFIX = 'http://api.ipma.pt/open-data/forecast/
 function IPMA (id, controller) {
     // Call superconstructor first (AutomationModule)
     IPMA.super_.call(this, id, controller);
-
-    this.interval           = undefined;
-    this.pollTimeout        = undefined;
 }
 
 inherits(IPMA, AutomationModule);
@@ -33,19 +30,53 @@ IPMA.prototype.init = function (config) {
     var self = this;
 
     // Create rain sensor
-    self.rainSensor = this.controller.devices.create({
-        deviceId: "IPMA_" + self.id,
+    self.rainProbabilitySensor = this.controller.devices.create({
+        deviceId: "IPMA_Rain_Probability_Sensor_" + self.id,
         defaults: {
-            deviceType: 'sensorBinary',
+            deviceType: 'sensorMultilevel',
+            probetype: 'temperature',
             metrics: {
-                title: 'IPMA',
-                level: 'off',
-                rain: 'off',
+                scaleTitle: '%',
+                title: 'IPMA rain probability virtual sensor',
+                level: '0.0',
                 icon: self.imagePath+'/icon_norain.png'
             }
         },
+        overlay: {},
+        handle: function(command, args) {},
+        moduleId: this.id
+    });
+    // Create max temperature sensor
+    self.maxTempSensor = this.controller.devices.create({
+        deviceId: "IPMA_Max_Temp_Sensor_" + self.id,
+        defaults: {
+            deviceType: 'sensorMultilevel',
+            probetype: 'temperature',
+            metrics: {
+                title: 'IPMA max temperature sensor',
+                level: '0.0',
+                icon: 'temperature'
+            }
+        },
         overlay: {
-            deviceType: 'sensorBinary',
+            deviceType: 'sensorMultilevel',
+        },
+        moduleId: this.id
+    });
+    // Create min temperature sensor
+    self.minTempSensor = this.controller.devices.create({
+        deviceId: "IPMA_Min_Temp_Sensor_" + self.id,
+        defaults: {
+            deviceType: 'sensorMultilevel',
+            probetype: 'temperature',
+            metrics: {
+                title: 'IPMA min temperature sensor',
+                level: '0.0',
+                icon: 'temperature'
+            }
+        },
+        overlay: {
+            deviceType: 'sensorMultilevel',
         },
         moduleId: this.id
     });
@@ -66,19 +97,24 @@ IPMA.prototype.init = function (config) {
         month: null
     });
 
-    console.log('[IPMA] initialized, rain probability threshold: ' + self.config.rainProbabilityThreshold.toString());
+    console.log('[IPMA] initialized, location code: ' + self.config.ipmaLocationCode);
 };
 
 IPMA.prototype.stop = function () {
     var self = this;
 
-    if (self.rainSensor) {
-        self.controller.devices.remove(self.rainSensor.id);
-        self.rainSensor = undefined;
+    if (self.rainProbabilitySensor) {
+        self.controller.devices.remove(self.rainProbabilitySensor.id);
+        self.rainProbabilitySensor = undefined;
     }
-
-    clearInterval(self.interval);
-    self.interval = undefined;
+    if (self.maxTempSensor) {
+        self.controller.devices.remove(self.maxTempSensor.id);
+        self.maxTempSensor = undefined;
+    }
+    if (self.minTempSensor) {
+        self.controller.devices.remove(self.minTempSensor.id);
+        self.minTempSensor = undefined;
+    }
 
     IPMA.super_.prototype.stop.call(this);
 };
@@ -90,11 +126,9 @@ IPMA.prototype.stop = function () {
 IPMA.prototype.check = function() {
     var self = this;
 
-    var rainProbabilityThreshold = parseFloat(self.config.rainProbabilityThreshold)  || 0;
-
-    console.log('Checking IPMA');
+    var ipmaLocationCode = self.config.ipmaLocationCode;
     request = {
-        url: IPMA_5_DAY_LOCAL_FORECAST_PREFIX + '/1110600.json',
+        url: IPMA_5_DAY_LOCAL_FORECAST_PREFIX + '/' + ipmaLocationCode + '.json',
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -102,7 +136,7 @@ IPMA.prototype.check = function() {
     };
     console.log('[IPMA] request: ' + JSON.stringify(request));
     var response = http.request(request);
-    console.log('[IPMA] response: ' + JSON.stringify(response));
+    // console.log('[IPMA] response: ' + JSON.stringify(response));
     if (response.status != 200) {
         console.log('[IPMA] request failed with status ' + response.status.toString());
         return;
@@ -115,9 +149,8 @@ IPMA.prototype.check = function() {
     var todaysMinTemp = parseFloat(todaysPrediction.tMin);
     var todaysMaxTemp = parseFloat(todaysPrediction.tMax);
 
-    if (todaysRainProbability > self.config.rainProbabilityThreshold) {
-        self.rainSensor.set('metrics:level', 'on');
-        self.rainSensor.set('metrics:rain', 'on');
-    }
+    self.rainProbabilitySensor.set('metrics:level', todaysRainProbability);
+    self.maxTempSensor.set('metrics:level', todaysMaxTemp);
+    self.minTempSensor.set('metrics:level', todaysMinTemp);
 };
 
