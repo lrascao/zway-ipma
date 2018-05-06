@@ -1,5 +1,5 @@
 {
-   "singleton" : true,
+   "singleton" : false,
    "author" : "Luis Rascao",
    "category" : "environment",
    "dependencies" : [
@@ -16,12 +16,12 @@
    "defaults" : {
       "description" : "__m_descr__",
       "title" : "__m_title__",
-      "rainProbabilityThreshold" : 20.0
+      "ipmaLocationCode" : "1110600"
    },
    "schema" : {
         "type": "object",
         "properties": {
-            "rainProbabilityThreshold" : {
+            "ipmaLocationCode" : {
                 "required": true
             }
         },
@@ -29,9 +29,9 @@
    },
    "options" : {
       "fields" : {
-         "rainProbabilityThreshold" : {
-            "helper" : "__rain_probability_threshold_helper__",
-            "label" : "__rain_probability_threshold_label__",
+         "ipmaLocationCode" : {
+            "helper" : "__ipma_location_code_helper__",
+            "label" : "__ipma_location_code_label__",
             "order" : 1,
             "required": true
          }
